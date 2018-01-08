@@ -1,4 +1,4 @@
-package nju.java;
+package thunderning.java;
 
 
 import javax.swing.JFrame;

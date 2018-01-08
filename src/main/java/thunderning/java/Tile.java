@@ -1,4 +1,4 @@
-package nju.java;
+package thunderning.java;
 
 import java.awt.Image;
 import java.net.URL;

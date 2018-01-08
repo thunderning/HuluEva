@@ -1,34 +1,49 @@
-package nju.java;
+package thunderning.java;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import javax.swing.JPanel;
 
 public class Field extends JPanel {
 
     private final int OFFSET = 30;
-    private final int SPACE = 20;
+    private final int SPACE = 60;
 
     private ArrayList tiles = new ArrayList();
-    private Player player;
-    private Player player2;
+    private ArrayList<ArrayList<Position>> positions = new ArrayList<ArrayList<Position>>();
+    private ArrayList creatures = new ArrayList();
+//    private Creature creature;
+//    private Creature creature2;
 
-    private int w = 0;
-    private int h = 0;
+    private int rowCount = 10;
+    private int columnCount = 10;
+
+    private int justiceCount = 8;
+    private int injusticeCount = 8;
+
+    private int w = rowCount * SPACE + OFFSET;
+    private int h = rowCount * SPACE + OFFSET;
+
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
     private boolean completed = false;
 
-    private String level =
-            "..........\n" +
-                    "..........\n" +
-                    "..........\n" +
-                    "..........\n" +
-                    "..........\n" +
-                    "..........\n" +
-                    "..........\n" +
-                    "..........\n";
+//    private String level =
+//            "..........\n" +
+//                    "..........\n" +
+//                    "..........\n" +
+//                    "..........\n" +
+//                    "..........\n" +
+//                    "..........\n" +
+//                    "..........\n" +
+//                    "..........\n";
 
     public Field() {
 
@@ -52,34 +67,32 @@ public class Field extends JPanel {
 
         Tile a;
 
-
-        for (int i = 0; i < level.length(); i++) {
-
-            char item = level.charAt(i);
-
-            if (item == '\n') {
-                y += SPACE;
-                if (this.w < x) {
-                    this.w = x;
-                }
-
-                x = OFFSET;
-            } else if (item == '.') {
-                a = new Tile(x, y);
-                tiles.add(a);
-                x += SPACE;
-            } else if (item == '@') {
-                player = new Player(x, y, this);
-                x += SPACE;
-            } else if (item == ' ') {
-                x += SPACE;
+        for (int i = 0;i < this.rowCount ; i++){
+            ArrayList<Position> temp = new ArrayList<Position>();
+            for (int j = 0;j < this.columnCount ; j++){
+                temp.add(new Position(i,j));
+                tiles.add(new Tile(i,j));
             }
-
-            h = y;
+            positions.add(temp);
         }
 
-        player = new Player(0+ OFFSET,0+OFFSET, this);
-        player2 = new Player(20+OFFSET,30 +OFFSET,this);
+        creatures.add(new GrandPa(0,1,this));
+        creatures.add(new HuluEva(1,2,this,SENIORITY.一));
+        creatures.add(new HuluEva(2,3,this,SENIORITY.二));
+        creatures.add(new HuluEva(1,4,this,SENIORITY.三));
+        creatures.add(new HuluEva(2,5,this,SENIORITY.四));
+        creatures.add(new HuluEva(1,6,this,SENIORITY.五));
+        creatures.add(new HuluEva(2,7,this,SENIORITY.六));
+        creatures.add(new HuluEva(1,8,this,SENIORITY.七));
+        creatures.add(new Scorpion(8,4,this));
+        creatures.add(new Snake(9,5,this));
+        creatures.add(new Minion(9,1,this));
+        creatures.add(new Minion(8,2,this));
+        creatures.add(new Minion(9,3,this));
+        creatures.add(new Minion(8,6,this));
+        creatures.add(new Minion(9,7,this));
+        creatures.add(new Minion(8,8,this));
+
     }
 
     public void buildWorld(Graphics g) {
@@ -89,24 +102,30 @@ public class Field extends JPanel {
 
         ArrayList world = new ArrayList();
         world.addAll(tiles);
-
-
-        world.add(player);
-        world.add(player2);
+        world.addAll(creatures);
 
         for (int i = 0; i < world.size(); i++) {
 
             Thing2D item = (Thing2D) world.get(i);
 
-            if (item instanceof Player) {
-                g.drawImage(item.getImage(), item.x() + 2, item.y() + 2, this);
+            if (item instanceof Creature) {
+                if (((Creature) item).getIsAlive())
+                    g.drawImage(item.getImage(), OFFSET + item.x()*SPACE + 10 , item.y()*SPACE + OFFSET + 5, this);
+                else
+                    g.drawImage(item.getImage(), OFFSET + item.x()*SPACE + 5 , item.y()*SPACE + OFFSET + 10, this);
             } else {
-                g.drawImage(item.getImage(), item.x(), item.y(), this);
+                g.drawImage(item.getImage(), OFFSET + item.x()*SPACE, item.y()*SPACE + OFFSET, this);
             }
 
             if (completed) {
                 g.setColor(new Color(0, 0, 0));
-                g.drawString("Completed", 25, 20);
+                if (justiceCount == 0)
+                    g.drawString("INJUSTICE WIN!", 250, 20);
+                else
+                    g.drawString("JUSTICE WIN!", 250, 20);
+            }else{
+                g.setColor(new Color(0, 0, 0));
+                g.drawString("JUSTICE " + justiceCount + " : " + injusticeCount + " INJUSTICE", 250, 20);
             }
 
         }
@@ -131,35 +150,16 @@ public class Field extends JPanel {
             int key = e.getKeyCode();
 
 
-            if (key == KeyEvent.VK_LEFT) {
+            if (key == KeyEvent.VK_SPACE) {
 
-
-                player.move(-SPACE, 0);
-
-            } else if (key == KeyEvent.VK_RIGHT) {
-
-
-                player.move(SPACE, 0);
-
-            } else if (key == KeyEvent.VK_UP) {
-
-
-                player.move(0, -SPACE);
-
-            } else if (key == KeyEvent.VK_DOWN) {
-
-
-                player.move(0, SPACE);
-
-            } else if (key == KeyEvent.VK_S) {
-
-                new Thread(player).start();
-                new Thread(player2).start();
+                for (int i = 0;i<creatures.size();i++){
+                    Creature t = (Creature) creatures.get(i);
+                    new Thread(t).start();
+                }
 
             } else if (key == KeyEvent.VK_R) {
                 restartLevel();
             }
-
             repaint();
         }
     }
@@ -168,9 +168,35 @@ public class Field extends JPanel {
     public void restartLevel() {
 
         tiles.clear();
+        creatures.clear();
+
         initWorld();
         if (completed) {
             completed = false;
+        }
+    }
+
+    public Position getPosition(int x,int y){
+        return positions.get(y).get(x);
+    }
+    public int getRowCount() {
+        return rowCount;
+    }
+
+    public int getColumnCount() {
+        return columnCount;
+    }
+
+    public void oneJusticeKilled(){
+        justiceCount --;
+        if (justiceCount == 0){
+            completed = true;
+        }
+    }
+    public void oneInjusticeKilled(){
+        injusticeCount --;
+        if (injusticeCount == 0){
+            completed = true;
         }
     }
 }
