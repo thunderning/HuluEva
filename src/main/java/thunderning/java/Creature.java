@@ -13,7 +13,7 @@ import static java.lang.Thread.sleep;
 public abstract class Creature extends Thing2D implements Runnable {
     protected Field field;
     protected Position position;
-    protected String imageName = "player.png";
+    protected String imageName;
     protected boolean isJustice;
     protected boolean isAlive = true;
     protected int directionX;
