@@ -1,4 +1,4 @@
-package nju.java;
+package thunderning.java;
 
 
 import java.awt.Image;
@@ -36,7 +36,6 @@ public class Player extends Thing2D implements Runnable {
 
                 Thread.sleep(rand.nextInt(1000) + 1000);
                 this.field.repaint();
-
             } catch (Exception e) {
 
             }

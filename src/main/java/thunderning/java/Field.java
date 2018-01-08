@@ -14,6 +14,7 @@ public class Field extends JPanel {
 
     private ArrayList tiles = new ArrayList();
     private Player player;
+    private Player player2;
 
     private int w = 0;
     private int h = 0;
@@ -78,7 +79,7 @@ public class Field extends JPanel {
         }
 
         player = new Player(0+ OFFSET,0+OFFSET, this);
-
+        player2 = new Player(20+OFFSET,30 +OFFSET,this);
     }
 
     public void buildWorld(Graphics g) {
@@ -91,7 +92,7 @@ public class Field extends JPanel {
 
 
         world.add(player);
-
+        world.add(player2);
 
         for (int i = 0; i < world.size(); i++) {
 
@@ -153,6 +154,7 @@ public class Field extends JPanel {
             } else if (key == KeyEvent.VK_S) {
 
                 new Thread(player).start();
+                new Thread(player2).start();
 
             } else if (key == KeyEvent.VK_R) {
                 restartLevel();
